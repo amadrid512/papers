@@ -78,7 +78,6 @@ export function ListPage() {
         <thead>
           <tr>
             <th>Manuscript ID</th>
-            <th>PubMed ID</th>
             <th>Manuscript Title</th>
             <th>Actions</th>
           </tr>
@@ -87,7 +86,6 @@ export function ListPage() {
           {data.map(c => (
             <tr key={c.MS_ID}>
               <td>{c.MS_ID}</td>
-              <td>{c.PMID}</td>
               <td>{c.TITLE}</td>
               <td>
                 <button className="btn" onClick={() => setEditItem(c)}>
@@ -110,18 +108,25 @@ function EditForm(props) {
     <Formik initialValues={{ ...props.editItem }} onSubmit={props.doSubmit}>
       {() => (
         <Form>
-          {/* <Field name="MS_ID" placeholder="Manuscript ID" /> */}
           <div>
-            <label>Stage ID: </label>
+            <label>Manuscript ID</label>
+            <Field name="MS_ID" placeholder="Manuscript ID" />
+          </div>
+          <div>
+            <label>Title </label>
+            <Field name="TITLE" placeholder="Manuscript Title" />
+          </div>
+          <div>
+            <label>Stage </label>
             <Field name="STAGE_ID" placeholder="Stage ID" />
           </div>
           <div>
-            <label>PubMed ID: </label>
-            <Field name="PMID" placeholder="PubMed ID" />
+            <label>Analytic Stage </label>
+            <Field name="ANALYTIC_STAGE" placeholder="Stage ID" />
           </div>
           <div>
-            <label>Title: </label>
-            <Field name="TITLE" placeholder="Manuscript Title" />
+            <label>Convener </label>
+            <Field name="CONVENER" placeholder="Convener" />
           </div>
           <br />
           <Button type="submit" label="Submit" />

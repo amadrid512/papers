@@ -6,8 +6,11 @@ export function Home() {
     <div className="Container">
       <h1>WHI ​Publications and Paper Proposals</h1>
       <ul>
-        <li>
+      <li>
           <Link to="/listpage">Published Papers</Link>
+        </li>
+        <li>
+          <Link to="/listpage_usingdatatables">Published Papers (data tables)</Link>
         </li>
         <li>
           <Link to="/crudRestDemo">Rest Crud Demo</Link>

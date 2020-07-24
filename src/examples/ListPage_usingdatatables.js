@@ -1,6 +1,7 @@
 import React from "react"
 import { CRUDURL, doInsert, doEdit, doDelete, QUERYURL, fetchJson } from "../lib/restHelpers"
 import { Formik, Form, Field } from "formik"
+import { Dialog } from "primereact/dialog"
 import { Button } from "primereact/button"
 import { FaPlus, FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import { DataTable } from "primereact/datatable"
@@ -8,7 +9,7 @@ import { Column } from "primereact/column"
 
 const crudUrl = `${CRUDURL}/papers`
 
-export function ListPage() {
+export function ListPage_usingdatatables() {
   const [data, setData] = React.useState()
   const [editItem, setEditItem] = React.useState() //holds the row to be edited or inserted
   const [refreshData, setRefreshData] = React.useState(true) // used to fire a re-query of the data after a crud op
@@ -57,35 +58,69 @@ export function ListPage() {
     setEditItem(null) //clear edit item so edit form dissapears
   }
 
+function actions(rowdata){
+  return (
+    <>
+    <button className="btn" onClick={() => setEditItem(rowdata)}>
+    <FaPencilAlt title="Edit" />
+  </button>
+  <button className="btn ml-2" onClick={() => deleteItem(rowdata)}>
+    <FaTrashAlt title="Delete" />
+  </button>
+</>
+  )
+}
+
   if (!data) return "Loading..." //while fetch is getting data, display this message
 
   return (
     <div className="container">
-      <h1>Papers</h1>
-      <DataTable value={data}>
-        <Column field="MS_ID" header="Manuscript ID" sortable={true} />
-        <Column field="PMID" header="PMID" sortable={true} />
-        {/* <Column field="PMID" header="PMID" sortable={true} body={row => <Link to={"detail/" + row.PUB_SID}>{row.PUB_FILENAME}</Link>} /> */}
-        <Column field="TITLE" header="Manuscript Title" sortable={true} />
+      <h1>Published Papers</h1>
+      {editItem && (
+        <Dialog header="Paper Detail" visible={true} style={{ width: "75vw" }} modal={true} onHide={() => this.setState({ visible: false })}>
+          <EditForm editItem={editItem} doSubmit={doSubmit} cancelEdit={() => setEditItem(null)} />
+        </Dialog>
+      )}
+      <DataTable value={data} paginator={true} rows={100} >
+        <Column field="MS_ID" header="Manuscript ID" sortable={true} filter={true} style={{width:'10%'}}/>
+        <Column field="TITLE" header="Title" sortable={true} filter={true}style={{width:'60%'}}/>
         {/* <Column field="TITLE" header="Manuscript Title" sortable={true} body={row => row.PUB_PUBLISH_DATE.toLocaleDateString()} /> */}
-        <Column
-          field="ACTIONS"
-          header="Actions"
-          sortable={false}
-          body={record => {
-            return (
-              // <Fragment>
-                <button className="btn btn-primary btn-sm" onClick={() => this.editRecord(record)}>
-                  <i className="fa fa-edit"></i>
-                </button>
-                <button className="btn btn-danger btn-sm" onClick={() => this.deleteRecord(record)}>
-                  <i className="fa fa-trash"></i>
-                </button>
-              // </Fragment>
-            )
-          }}
-        />
+        <Column header="Actions" sortable={false} body={actions} style={{width:'10%'}} />
       </DataTable>
     </div>
+  )
+}
+
+function EditForm(props) {
+  return (
+    <Formik initialValues={{ ...props.editItem }} onSubmit={props.doSubmit}>
+      {() => (
+        <Form>
+          <div> 
+            <label>Manuscript ID</label>
+            <Field name="MS_ID" placeholder="Manuscript ID" />
+          </div>
+          <div>
+            <label>Title </label>
+            <Field name="TITLE" placeholder="Manuscript Title" />
+          </div>
+          <div>
+            <label>Stage </label>
+            <Field name="STAGE_ID" placeholder="Stage ID" />
+          </div>
+          <div>
+            <label>Analytic Stage </label>
+            <Field name="ANALYTIC_STAGE" placeholder="Stage ID" />
+          </div>
+          <div>
+            <label>Convener </label>
+            <Field name="CONVENER" placeholder="Convener" />
+          </div>
+          <br />
+          <Button type="submit" label="Submit" />
+          <Button type="button" label="Cancel" onClick={() => props.cancelEdit()} />
+        </Form>
+      )}
+    </Formik>
   )
 }
