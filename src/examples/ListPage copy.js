@@ -6,7 +6,6 @@ import { Button } from "primereact/button"
 import { FaPlus, FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
-import { Link } from "@reach/router"
 
 const crudUrl = `${CRUDURL}/papers`
 
@@ -89,9 +88,7 @@ function actions(rowdata){
       </div>
 
       <DataTable value={data} paginator={true} rows={100} >
-        <Column field="MS_ID" header="Manuscript ID" 
-          body={rowdata => <Link to={'/detailpage/' + rowdata['MS_ID']}>{rowdata['MS_ID']}</Link>}
-          sortable={true} filter={true} filterPlaceholder="Search" style={{width:'10%'}}/>
+        <Column field="MS_ID" header="Manuscript ID" sortable={true} filter={true} filterPlaceholder="Search" style={{width:'10%'}}/>
         <Column field="TITLE" header="Title" sortable={true} filter={true} filterPlaceholder="Search" style={{width:'60%'}}/>
         {/* <Column field="TITLE" header="Manuscript Title" sortable={true} body={row => row.PUB_PUBLISH_DATE.toLocaleDateString()} /> */}
         <Column header="Keywords" filter={true} filterPlaceholder="Search" style={{width:'20%'}} />
@@ -108,18 +105,18 @@ function EditForm(props) {
         <Form>
           <div class="form-row">   
             <div className="form-group col-md-2">
-              <label htmlFor="msIDInput">Manuscript ID</label>
+              <label for="msIDInput">Manuscript ID</label>
               <Field name="MS_ID" placeholder="Manuscript ID" className="form-control" id="msIDInput" />
             </div>
             <div className="form-group col-md-10">
-              <label htmlFor="titleInput">Title </label>
+              <label for="titleInput">Title </label>
               <Field name="TITLE" placeholder="Manuscript Title" className="form-control" id="titleInput"/>
             </div>
           </div>
 
           <div class="form-row">             
             <div className="form-group col-md-4">
-              <label htmlFor="stageInput" >Stage</label>
+              <label for="stageInput" >Stage</label>
               <Field as="select" name="STAGE_ID" placeholder="Stage ID" className="form-control" id="stageInput">
                 <option value="0"	label="0 Proposal submitted"/>
                 <option value="1" label="1	Assigned to reviewers"/>
@@ -142,7 +139,7 @@ function EditForm(props) {
               </Field>
             </div>
             <div className="form-group col-md-4">
-              <label htmlFor="analyticStageInput" >Analytic Stage </label>
+              <label for="analyticStageInput" >Analytic Stage </label>
               <Field as="select" name="ANALYTIC_STAGE" placeholder="Analytic Stage" className="form-control" id="analyticStageInput">
                  <option value="" label="Analytic Stage"></option>
                 <option value="1" label="1 Proposal approved"></option>
@@ -164,18 +161,18 @@ function EditForm(props) {
               </Field>             
             </div>
             <div className="form-group col-md-4">
-              <label htmlFor="convenerInput" >Convener </label>
+              <label for="convenerInput" >Convener </label>
               <Field name="CONVENER" placeholder="Convener" className="form-control" id="convenerInput"/>
             </div>
           </div>
 
           <div class="form-row">   
             <div className="form-group col-md-4">
-              <label htmlFor="authorsInput">List of Authors</label>
+              <label for="authorsInput">List of Authors</label>
               <Field name="AUTHORS" placeholder="List of Authors [Array]" className="form-control" id="authorsInput" />
             </div>
             <div className="form-group col-md-4">
-              <label htmlFor="paperTypeInput">Paper Type </label>
+              <label for="paperTypeInput">Paper Type </label>
               <Field as="select" name="PAPER_TYPE" placeholder="Paper Type" className="form-control" id="paperTypeInput">
                 <option value="" label="Paper Type"></option>
                 <option value="1" label="Group-authored"></option>
@@ -187,7 +184,7 @@ function EditForm(props) {
               </Field>
             </div>
             <div className="form-group col-md-4">
-              <label htmlFor="categoryInput">Category </label>
+              <label for="categoryInput">Category </label>
               <Field as="select" name="CATEGORY" placeholder="Category" className="form-control" id="categoryInput">
                 <option value="" label="Category"></option>
                 <option value="1" label="Peer-reviewed"></option>
@@ -199,56 +196,56 @@ function EditForm(props) {
 
           <div class="form-row">   
             <div className="form-group col-md-4">
-              <label htmlFor="relatedPapersInput">Related Papers</label>
+              <label for="relatedPapersInput">Related Papers</label>
               <Field name="RELATED_PAPERS" placeholder="Related Papers (Mark All)" className="form-control" id="relatedPapersInput" />
             </div>
             <div className="form-group col-md-2">
-              <label htmlFor="consortiumIDInput">Consortium </label>
+              <label for="consortiumIDInput">Consortium </label>
               <Field name="CONSORTIUM_ID" placeholder="Consortium" className="form-control" id="consortiumIDInput"/>
             </div>
             <div className="form-group col-md-3">
-              <label htmlFor="proposalApprovalInput">PP Proposal Approval</label>
+              <label for="proposalApprovalInput">PP Proposal Approval</label>
               <Field name="PP_PROPOSAL_APPROVAL" placeholder="PP Proposal Approval" className="form-control" id="proposalApprovalInput"/>
             </div>
             <div className="form-group col-md-3">
-              <label htmlFor="manApprovalInput">PP Paper Approval </label>
+              <label for="manApprovalInput">PP Paper Approval </label>
               <Field name="PP_MANUSCRIPT_APPROVAL" placeholder="PP Paper Approval" className="form-control" id="manApprovalInput"/>
             </div>
           </div>
 
           <div class="form-row">   
             <div className="form-group col-md-8">
-              <label htmlFor="referenceInput">Reference</label>
+              <label for="referenceInput">Reference</label>
               <Field name="REFERENCE" placeholder="Reference" className="form-control" id="referenceInput" />
             </div>
             <div className="form-group col-md-2">
-              <label htmlFor="pubMonthInput">Pub Month </label>
+              <label for="pubMonthInput">Pub Month </label>
               <Field name="PUB_MONTH" placeholder="Pub Month " className="form-control" id="pubMonthInput"/>
             </div>
             <div className="form-group col-md-2">
-              <label htmlFor="pubYearInput">Pub Year </label>
+              <label for="pubYearInput">Pub Year </label>
               <Field name="PUB_YEAR" placeholder="Pub Year " className="form-control" id="pubYearInput"/>
             </div>
           </div>
 
           <div class="form-row">   
             <div className="form-group col-md-8">
-              <label htmlFor="citationInput">Full Citation</label>
+              <label for="citationInput">Full Citation</label>
               <Field name="FULL_CITATION" placeholder="Full Citation" className="form-control" id="citationInput" />
             </div>
             <div className="form-group col-md-2">
-              <label htmlFor="pubmedIDInput">PubMed ID </label>
+              <label for="pubmedIDInput">PubMed ID </label>
               <Field name="PMID" placeholder="PubMed ID" className="form-control" id="pubmedIDInput"/>
             </div>
             <div className="form-group col-md-2">
-              <label htmlFor="pubmedCentralInput">PubMed Central </label>
+              <label for="pubmedCentralInput">PubMed Central </label>
               <Field name="PUBMED_CENTRAL" placeholder="PubMed Central" className="form-control" id="pubmedCentralInput"/>
             </div>
           </div>
 
           <div class="form-row">   
             <div className="form-group col-md-12">
-              <label htmlFor="abstractInput">Abstract</label>
+              <label for="abstractInput">Abstract</label>
               <Field name="ABSTRACT" placeholder="Abstract" className="form-control" id="abstractInput" />
             </div>
           </div>

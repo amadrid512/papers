@@ -7,10 +7,7 @@ export function Home() {
       <h1>WHI ​Publications and Paper Proposals</h1>
       <ul>
       <li>
-          <Link to="/listpage">Published Papers</Link>
-        </li>
-        <li>
-          <Link to="/listpage_usingdatatables">Published Papers (data tables)</Link>
+          <Link to="/listpage">Manuscripts Main Tracking</Link>
         </li>
         <li>
           <Link to="/crudRestDemo">Rest Crud Demo</Link>
