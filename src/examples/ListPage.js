@@ -6,30 +6,35 @@ import { Button } from "primereact/button"
 import { FaPlus, FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
-import { Link } from "@reach/router"
+import { Link } from "react-router-dom"
 
 const crudUrl = `${CRUDURL}/papers`
+var isInsert = 'false'
 
-export function ListPage() {
+export function ListPage(props) {
   const [data, setData] = React.useState()
   const [editItem, setEditItem] = React.useState() //holds the row to be edited or inserted
   const [refreshData, setRefreshData] = React.useState(true) // used to fire a re-query of the data after a crud op
+  const [nextID, setNextID] = React.useState()
 
   React.useEffect(() => {
     //query the category data (fires when refreshData is changed)
     if (refreshData) {
       fetch(crudUrl)
         .then(resp => resp.json())
-        .then(json => setData(json.sort((a, b) => a.MS_ID > b.MS_ID)))
+        .then(json => {setData(json.sort((a, b) => a.MS_ID > b.MS_ID))
+        setNextID(json.reduce((max, row) => (row.MS_ID * 1 > max ? row.MS_ID * 1 : max), 0)+1)})
       setRefreshData(false)
     }
   }, [refreshData])
 
-  function createNewItem() {
+/*    function createNewItem() {
     //set edit item with a dummy row, -1 for pk col will be replaced later...
-    setEditItem({ MS_ID: -1, PMID: "", TITLE: "" })
+    const max_id = data.reduce((max, row) => (row.MS_ID * 1 > max ? row.MS_ID * 1 : max), 0)
+    setEditItem({ MS_ID: max_id + 1, PMID: "", TITLE: "", STAGE_ID: "0"})
+    isInsert = 'true'
   }
-
+ */ 
   async function deleteItem(item) {
     //do delete after confirming its ok
     if (window.confirm("are you sure you want to delete MS" + item.MS_ID + "?")) {
@@ -38,27 +43,30 @@ export function ListPage() {
     }
   }
 
-  async function doSubmit(values) {
+/*   async function doSubmit(values) {
     //do edit or insert when form is submitted
-    const isInsert = values.MS_ID === -1 //-1 is flag that this is a new row to be inserted
+    //const isInsert = values.MS_ID === -1 //-1 is flag that this is a new row to be inserted
+    console.log(isInsert)
     try {
       if (isInsert) {
         //calc next id
-        const max_id = data.reduce((max, row) => (row.MS_ID * 1 > max ? row.MS_ID * 1 : max), 0)
-        values.MS_ID = max_id + 1 //next id
-
+        //const max_id = data.reduce((max, row) => (row.MS_ID * 1 > max ? row.MS_ID * 1 : max), 0)
+        //values.MS_ID = max_id + 1 //next id
+        console.log(values.MS_ID)
+        console.log(crudUrl)
         await doInsert(crudUrl, values).then(resp => resp.json())
       } else {
+        console.log(isInsert)
         await doEdit(crudUrl, values).then(resp => resp.json())
       }
-
+      isInsert = 'false'
       setRefreshData(true) //fire off a requery of the page after the insert/update
     } catch (error) {
       alert("Something went wrong")
     }
     setEditItem(null) //clear edit item so edit form dissapears
   }
-
+ */
 function actions(rowdata){
   return (
     <>
@@ -77,21 +85,23 @@ function actions(rowdata){
   return (
     <div className="container">
       <h1>Manuscripts Main Tracking</h1>
-      {editItem && (
-        <Dialog header="Paper Detail" visible={true} style={{ width: "95vw" }} modal={true} onHide={() => this.setState({ visible: false })}>
-          <EditForm editItem={editItem} doSubmit={doSubmit} cancelEdit={() => setEditItem(null)} />
-        </Dialog>
-      )}
+      {//editItem && (
+        // <Dialog header="Paper Detail" visible={true} style={{ width: "95vw" }} modal={true} onHide={() => this.setState({ visible: false })}>
+        //  <EditForm editItem={editItem} doSubmit={doSubmit} cancelEdit={() => setEditItem(null)} />
+        // </Dialog>
+      //)
+    }
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button className="btn" onClick={createNewItem}>
+        <Link className="btn" to={'detailpage/' + nextID}>
           Add New <FaPlus title="Add New Row" />
-        </button>
+        </Link>
       </div>
 
       <DataTable value={data} paginator={true} rows={100} >
         <Column field="MS_ID" header="Manuscript ID" 
-          body={rowdata => <Link to={'/detailpage/' + rowdata['MS_ID']}>{rowdata['MS_ID']}</Link>}
-          sortable={true} filter={true} filterPlaceholder="Search" style={{width:'10%'}}/>
+                body={rowdata => <Link to={'detailpage/' + rowdata.MS_ID}>{rowdata.MS_ID}</Link>}
+                //body={row => <Link to={"detail/" + row.PUB_SID}>{row.PUB_FILENAME}</Link>}
+                sortable={true} filter={true} filterPlaceholder="Search" style={{width:'10%'}}/>
         <Column field="TITLE" header="Title" sortable={true} filter={true} filterPlaceholder="Search" style={{width:'60%'}}/>
         {/* <Column field="TITLE" header="Manuscript Title" sortable={true} body={row => row.PUB_PUBLISH_DATE.toLocaleDateString()} /> */}
         <Column header="Keywords" filter={true} filterPlaceholder="Search" style={{width:'20%'}} />
