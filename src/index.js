@@ -5,7 +5,7 @@ import "primereact/resources/themes/nova-light/theme.css"
 import "primereact/resources/primereact.min.css"
 import "primeicons/primeicons.css"
 
-import { App } from "./examples/App"
+import { App } from "./App"
 
 ReactDOM.render(
   <React.StrictMode>
