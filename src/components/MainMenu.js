@@ -33,7 +33,7 @@ export function MainMenu() {
     ]
     return( 
         <Menubar model={items}>
-            Add New <FaPlus title="Add New Row" />
+           
         </Menubar>
         // <InputText placeholder="Search" type="text"/>  Put inside Menubar if want to implement a search option cjb - 07/10/209
     )

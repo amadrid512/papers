@@ -92,7 +92,7 @@ function actions(rowdata){
         // </Dialog>
       //)
     }
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex"}}>
         <Link className="btn" to={'detailpage/' + nextID}>
           Add New <FaPlus title="Add New Row" />
         </Link>
