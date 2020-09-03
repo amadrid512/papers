@@ -9,7 +9,7 @@ import { Column } from "primereact/column"
 import { Link } from "@reach/router"
 
 
-const crudUrl = `${CRUDURL}/papers`
+const crudUrlPapers = `${CRUDURL}/papers`
 var isInsert = 'false'
 
 export function ListPage(props) {
@@ -21,7 +21,7 @@ export function ListPage(props) {
   React.useEffect(() => {
     //query the category data (fires when refreshData is changed)
     if (refreshData) {
-      fetch(crudUrl)
+      fetch(crudUrlPapers)
         .then(resp => resp.json())
         .then(json => {setData(json.sort((a, b) => a.MS_ID > b.MS_ID))
         setNextID(json.reduce((max, row) => (row.MS_ID * 1 > max ? row.MS_ID * 1 : max), 0)+1)})
@@ -39,7 +39,7 @@ export function ListPage(props) {
   async function deleteItem(item) {
     //do delete after confirming its ok
     if (window.confirm("are you sure you want to delete MS" + item.MS_ID + "?")) {
-      await doDelete(crudUrl, item)
+      await doDelete(crudUrlPapers, item)
       setRefreshData(true)
     }
   }
