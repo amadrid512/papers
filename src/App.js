@@ -1,5 +1,5 @@
 import React from "react"
-import { BrowserRouter, Switch, Route } from "react-router-dom"
+//import { BrowserRouter, Switch, Route } from "react-router-dom"
 import { Router } from "@reach/router";
 
 import { Home } from "./Home"
@@ -14,18 +14,5 @@ export function App() {
       <ListPage path="/listpage"/>
 
     </Router>
-/*     <BrowserRouter>
-      <Switch>
-        <Route path="/detailpage/:id">
-          <DetailPage />
-        </Route>
-        <Route exact path="/listpage">
-          <ListPage />
-        </Route>
-        <Route exact path="/">
-          <Home />
-        </Route>
-      </Switch>
-    </BrowserRouter>
- */  )
+  )
 }
