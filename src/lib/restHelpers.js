@@ -1,5 +1,5 @@
-export const JSON_API_ROOT = process.env.REACT_APP_JSON_API_ROOT || "https://appccc.whi.org/api"
-//export const JSON_API_ROOT = process.env.REACT_APP_JSON_API_ROOT || "https://devccc.whi.org/api"
+//export const JSON_API_ROOT = process.env.REACT_APP_JSON_API_ROOT || "https://appccc.whi.org/api"
+export const JSON_API_ROOT = process.env.REACT_APP_JSON_API_ROOT || "https://devccc.whi.org/api"
 export const QUERYURL = `${JSON_API_ROOT}/query`
 export const CRUDURL = `${JSON_API_ROOT}/crud`
 export const PROCURL = `${JSON_API_ROOT}/proc`
