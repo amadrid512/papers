@@ -38,91 +38,124 @@ export function DetailPage() {
     { value: "vanilla", label: "Vanilla" }
   ]
 
+  const paperStudyURL = `${CRUDURL}/paper_studies`
+
   React.useEffect(() => {
-    async function fetchData() {
-      const papersPromise = fetch(`${QUERYURL}/papers?id=${id}`).then(resp => resp.json())
-      const stagesPromise = fetch(`${QUERYURL}/paper_stages`).then(resp => resp.json())
-      const analyticStagesPromise = fetch(`${QUERYURL}/paper_analytic_stages`).then(resp => resp.json())
-      const statisticiansPromise = fetch(`${QUERYURL}/paper_statisticians`).then(resp => resp.json())
-      const paperTypesPromise = fetch(`${QUERYURL}/paper_types`).then(resp => resp.json())
-      const dataFocusPromise = fetch(`${QUERYURL}/paper_data_focus`).then(resp => resp.json())
-      const paperFocusPromise = fetch(`${QUERYURL}/paper_focus`).then(resp => resp.json())
-      const sigsPromise = fetch(`${QUERYURL}/paper_sigs`).then(resp => resp.json())
-      const alphaAuthorsPromise = fetch(`${QUERYURL}/paper_alpha_authors`).then(resp => resp.json())
-      const consortiaPromise = fetch(`${QUERYURL}/paper_consortia`).then(resp => resp.json())
-      const sponsoringPIPromise = fetch(`${QUERYURL}/paper_sponsoring_pis`).then(resp => resp.json())
-      const studiesPromise = fetch(`${QUERYURL}/paper_studies_access`).then(resp => resp.json())
-      const relatedStudiesPromise = fetch(`${QUERYURL}/paper_related_studies?ms_id=${id}`).then(resp => resp.json())
-
-      let [papers, stages, analyticStages, statisticians, paperTypes, dataFocus, paperFocus, sigs, alphaAuthors, consortia, sponsoringPI, studies] = await Promise.all([papersPromise, stagesPromise, analyticStagesPromise, statisticiansPromise, paperTypesPromise, dataFocusPromise, paperFocusPromise, sigsPromise, alphaAuthorsPromise, consortiaPromise, sponsoringPIPromise, studiesPromise, relatedStudiesPromise])
-
-      if (papers.length > 0) {
-        setData(papers[0])
-        setIsInsert(false)
-      } else {
-        setData({ MS_ID: id, PMID: "", TITLE: "", STAGE_ID: "0", CONVENER: "" })
-        setIsInsert(true)
-      }
-
-      if (stages) {
-        setStages(stages)
-      }
-
-      if (analyticStages) {
-        setAnalyticStages(analyticStages)
-      }
-
-      if (statisticians) {
-        setStatisticians(statisticians)
-      }
-
-      if (paperTypes) {
-        setPaperTypes(paperTypes)
-      }
-
-      if (dataFocus) {
-        setDataFocus(dataFocus)
-      }
-
-      if (paperFocus) {
-        setPaperFocus(paperFocus)
-      }
-
-      if (sigs) {
-        setSigs(sigs)
-      }
-
-      if (alphaAuthors) {
-        setAlphaAuthors(alphaAuthors)
-      }
-
-      if (consortia) {
-        setConsortia(consortia)
-      }
-
-      if (sponsoringPI) {
-        setSponsoringPI(sponsoringPI)
-      }
-
-      if (studies) {
-        setStudies(studies)
-      }
-
-      if (relatedStudies) {
-        setRelatedStudies(relatedStudies)
-      }
+    if (id) {
+      fetchPapers()
+      fetchData()
     }
-    if (id) fetchData()
   }, [id])
+
+  React.useEffect(() => {
+    if (refreshData) {
+      fetchPapers()
+      setRefreshData(false)
+    }
+  }, [refreshData])
+
+  async function fetchPapers() {
+    fetch(`${QUERYURL}/papers?id=${id}`)
+      .then(resp => resp.json())
+      .then(json => {
+        if (json.length > 0) {
+          setData(json[0])
+          setIsInsert(false)
+        } else {
+          setData({ MS_ID: id, PMID: "", TITLE: "", STAGE_ID: "0", CONVENER: "" })
+          setIsInsert(true)
+        }
+      })
+  }
+
+  async function fetchData() {
+    //const papersPromise = fetch(`${QUERYURL}/papers?id=${id}`).then(resp => resp.json())
+    const stagesPromise = fetch(`${QUERYURL}/paper_stages`).then(resp => resp.json())
+    const analyticStagesPromise = fetch(`${QUERYURL}/paper_analytic_stages`).then(resp => resp.json())
+    const statisticiansPromise = fetch(`${QUERYURL}/paper_statisticians`).then(resp => resp.json())
+    const paperTypesPromise = fetch(`${QUERYURL}/paper_types`).then(resp => resp.json())
+    const dataFocusPromise = fetch(`${QUERYURL}/paper_data_focus`).then(resp => resp.json())
+    const paperFocusPromise = fetch(`${QUERYURL}/paper_focus`).then(resp => resp.json())
+    const sigsPromise = fetch(`${QUERYURL}/paper_sigs`).then(resp => resp.json())
+    const alphaAuthorsPromise = fetch(`${QUERYURL}/paper_alpha_authors`).then(resp => resp.json())
+    const consortiaPromise = fetch(`${QUERYURL}/paper_consortia`).then(resp => resp.json())
+    const sponsoringPIPromise = fetch(`${QUERYURL}/paper_sponsoring_pis`).then(resp => resp.json())
+    const studiesPromise = fetch(`${QUERYURL}/paper_studies_access`).then(resp => resp.json())
+    //const relatedStudiesPromise = fetch(`${QUERYURL}/paper_related_studies?ms_id=${id}`).then(resp => resp.json())
+
+    let [stages, analyticStages, statisticians, paperTypes, dataFocus, paperFocus, sigs, alphaAuthors,
+      consortia, sponsoringPI, studies] = await Promise.all([stagesPromise, analyticStagesPromise,
+        statisticiansPromise, paperTypesPromise, dataFocusPromise, paperFocusPromise, sigsPromise, alphaAuthorsPromise,
+        consortiaPromise, sponsoringPIPromise, studiesPromise])
+
+    // if (papers.length > 0) {
+    //   setData(papers[0])
+    //   setIsInsert(false)
+    // } else {
+    //   setData({ MS_ID: id, PMID: "", TITLE: "", STAGE_ID: "0", CONVENER: "" })
+    //   setIsInsert(true)
+    // }
+
+    if (stages) {
+      setStages(stages)
+    }
+
+    if (analyticStages) {
+      setAnalyticStages(analyticStages)
+    }
+
+    if (statisticians) {
+      setStatisticians(statisticians)
+    }
+
+    if (paperTypes) {
+      setPaperTypes(paperTypes)
+    }
+
+    if (dataFocus) {
+      setDataFocus(dataFocus)
+    }
+
+    if (paperFocus) {
+      setPaperFocus(paperFocus)
+    }
+
+    if (sigs) {
+      setSigs(sigs)
+    }
+
+    if (alphaAuthors) {
+      setAlphaAuthors(alphaAuthors)
+    }
+
+    if (consortia) {
+      setConsortia(consortia)
+    }
+
+    if (sponsoringPI) {
+      setSponsoringPI(sponsoringPI)
+    }
+
+    if (studies) {
+      setStudies(studies)
+    }
+
+    // if (relatedStudies) {
+    //   setRelatedStudies(relatedStudies)
+    // }
+  }
+
 
   async function doSubmit(values) {
     //do edit or insert when form is submitted
     try {
+      let dbVals = values
+      delete dbVals.RELATED_STUDIES
       if (isInsert) {
         //calc next id
-        await doInsert(`${CRUDURL}/papers`, values).then(resp => resp.json())
+        await doInsert(`${CRUDURL}/papers`, dbVals).then(resp => resp.json())
       } else {
-        await doEdit(`${CRUDURL}/papers`, values).then(resp => resp.json())
+        await doEdit(`${CRUDURL}/papers`, dbVals).then(resp => resp.json())
       }
 
       setRefreshData(true) //fire off a requery of the page after the insert/update
@@ -133,6 +166,15 @@ export function DetailPage() {
     alert("MS-" + values.MS_ID + " has been SAVED")
   }
 
+  async function addStudyToPaper(study) {
+    console.log(study)
+  }
+
+  async function deleteStudyPaper(study) {
+    await doDelete(paperStudyURL, { MS_ID: id, STUDY_ABBR: study[0] }).then(() => setRefreshData(true))
+
+  }
+
   //if (!data) return "Loading..."
 
   return (
@@ -140,7 +182,12 @@ export function DetailPage() {
       <MainMenu />
       <TabView>
         <TabPanel header="Paper Detail">
-          <div className="container">{data && <EditPaper editItem={data} stages={stages} analyticStages={analyticStages} statisticians={statisticians} paperTypes={paperTypes} dataFocus={dataFocus} paperFocus={paperFocus} sigs={sigs} alphaAuthors={alphaAuthors} consortia={consortia} sponsoringPI={sponsoringPI} studies={studies} options={options} relatedStudies={relatedStudies} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
+          <div className="container">
+            {data && <EditPaper editItem={data} stages={stages} analyticStages={analyticStages} statisticians={statisticians}
+              paperTypes={paperTypes} dataFocus={dataFocus} paperFocus={paperFocus} sigs={sigs} alphaAuthors={alphaAuthors} consortia={consortia}
+              sponsoringPI={sponsoringPI} studies={studies} options={options}
+              doSubmit={doSubmit} deleteStudyPaper={deleteStudyPaper} addStudyToPaper={addStudyToPaper} cancelEdit={() => setData(null)} />}
+          </div>
         </TabPanel>
         <TabPanel header="Author List">
           <div className="container">{data && <EditAuthors editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
@@ -157,6 +204,7 @@ export function DetailPage() {
 }
 
 function EditPaper(props) {
+
   return (
     <Formik initialValues={{ ...props.editItem }} onSubmit={props.doSubmit}>
       {({ setFieldValue, values }) => (
@@ -278,7 +326,10 @@ function EditPaper(props) {
           <div className="form-row">
             <div className="form-group col-md-4">
               <label htmlFor="relatedPapersInput">Related Papers: NEED TO MAKE MULTICHOICE</label>
-              <Chips value={values.RELATED_STUDIES ? values.RELATED_STUDIES.map(row => row.STUDY_ABBR) : []} onChange={e => console.log(e)} separator="," />
+              <Chips value={props.editItem.RELATED_STUDIES ? props.editItem.RELATED_STUDIES.map(row => row.STUDY_ABBR) : []}
+                onAdd={e => props.addStudyToPaper(e.value)}
+                onRemove={e => props.deleteStudyPaper(e.value)}
+                separator="," />
 
               {/*               <Field as="select" name="RELATED_PAPERS" placeholder="Related Papers (Mark All)" className="form-control" id="relatedPapersInput" value={values.RELATED_PAPERS || ""}>
                 {props.relatedStudies &&
