@@ -12,6 +12,7 @@ import { Autocomplete } from "@material-ui/lab"
 import Select from "react-select"
 import { MultiSelect } from "primereact/multiselect"
 import { Chips } from "primereact/chips"
+import { format } from 'date-fns'
 
 export function DetailPage() {
   const { id } = useParams()
@@ -88,14 +89,6 @@ export function DetailPage() {
         statisticiansPromise, paperTypesPromise, dataFocusPromise, paperFocusPromise, sigsPromise, alphaAuthorsPromise,
         consortiaPromise, sponsoringPIPromise, studiesPromise])
 
-    // if (papers.length > 0) {
-    //   setData(papers[0])
-    //   setIsInsert(false)
-    // } else {
-    //   setData({ MS_ID: id, PMID: "", TITLE: "", STAGE_ID: "0", CONVENER: "" })
-    //   setIsInsert(true)
-    // }
-
     if (stages) {
       setStages(stages)
     }
@@ -140,11 +133,7 @@ export function DetailPage() {
       setStudies(studies)
     }
 
-    // if (relatedStudies) {
-    //   setRelatedStudies(relatedStudies)
-    // }
   }
-
 
   async function doSubmit(values) {
     //do edit or insert when form is submitted
@@ -167,7 +156,18 @@ export function DetailPage() {
   }
 
   async function addStudyToPaper(study) {
-    console.log(study)
+    let studyUpper = study.toUpperCase()
+
+    if (studies.filter(s => s.STUDY_NUMBER === studyUpper).length > 0) {
+      console.log(studies.filter(s => s.STUDY_NUMBER === studyUpper)[0].STUDY_ABBR)
+      studyUpper = studies.filter(s => s.STUDY_NUMBER === studyUpper)[0].STUDY_ABBR
+    }
+
+    if (data.RELATED_STUDIES.filter(s => s.STUDY_ABBR === studyUpper).length > 0) {
+      alert("Study already exists in paper")
+      return
+    }
+    await doInsert(paperStudyURL, { MS_ID: id, STUDY_ABBR: studyUpper }).then(() => setRefreshData(true))
   }
 
   async function deleteStudyPaper(study) {
@@ -251,7 +251,8 @@ function EditPaper(props) {
               <Field as="select" name="STAGE_ID" placeholder="Stage ID" className="form-control" id="stageInput">
                 {props.stages &&
                   props.stages.map(row => {
-                    return <option key={row.STAGE_ID} value={row.STAGE_ID === null ? "" : row.STAGE_ID} label={row.NAME} />
+                    return <option key={row.STAGE_ID} value={row.STAGE_ID === null ? "" : row.STAGE_ID} label={row.STAGE_ID + " - " + row.NAME
+                    } />
                   })}
               </Field>
             </div>
@@ -260,7 +261,7 @@ function EditPaper(props) {
               <Field as="select" name="ANALYTIC_STAGE" placeholder="Analytic Stage" className="form-control" id="analyticStageInput" value={values.ANALYTIC_STAGE || ""}>
                 {props.analyticStages &&
                   props.analyticStages.map(row => {
-                    return <option key={row.ANALYSIS_ID} value={row.ANALYSIS_ID === null ? "" : row.ANALYSIS_ID} label={row.ANALYSIS_STAGE} />
+                    return <option key={row.ANALYSIS_ID} value={row.ANALYSIS_ID === null ? "" : row.ANALYSIS_ID} label={row.ANALYSIS_ID + " - " + row.ANALYSIS_STAGE} />
                   })}
               </Field>
             </div>
@@ -297,6 +298,16 @@ function EditPaper(props) {
           </div>
 
           <div className="form-row">
+            <div className="form-group col-md-12">
+              <label htmlFor="relatedPapersInput">Related Papers</label>
+              <Chips value={props.editItem.RELATED_STUDIES ? props.editItem.RELATED_STUDIES.map(row => row.STUDY_ABBR) : []}
+                onAdd={e => props.addStudyToPaper(e.value)}
+                onRemove={e => props.deleteStudyPaper(e.value)}
+                separator="," />
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-group col-md-4">
               <div className="form-check">
                 <Field name="NDI_DATA_USED" className="form-control-sm form-check-input" id="ndiDataInput" type="checkbox" value={values.NDI_DATA_USED || ""} />
@@ -325,27 +336,13 @@ function EditPaper(props) {
 
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="relatedPapersInput">Related Papers: NEED TO MAKE MULTICHOICE</label>
-              <Chips value={props.editItem.RELATED_STUDIES ? props.editItem.RELATED_STUDIES.map(row => row.STUDY_ABBR) : []}
-                onAdd={e => props.addStudyToPaper(e.value)}
-                onRemove={e => props.deleteStudyPaper(e.value)}
-                separator="," />
-
-              {/*               <Field as="select" name="RELATED_PAPERS" placeholder="Related Papers (Mark All)" className="form-control" id="relatedPapersInput" value={values.RELATED_PAPERS || ""}>
-                {props.relatedStudies &&
-                  props.relatedStudies.map(row => {
-                    return <option key={row.MS_ID} value={row.STUDY_ABBR === null ? "" : row.MS_ID} label={row.STUDY_ABBR} />
-                  })}
-              </Field>
- */}
-            </div>
-            <div className="form-group col-md-3">
               <label htmlFor="proposalApprovalInput">PP Proposal Approval</label>
-              <Field name="PP_PROPOSAL_APPROVAL" placeholder="PP Proposal Approval" className="form-control" id="proposalApprovalInput" value={values.PP_PROPOSAL_APPROVAL || ""} />
+              <Field type="date" name="PP_PROPOSAL_APPROVAL" placeholder="PP Proposal Approval" className="form-control" id="proposalApprovalInput"
+                value={values.PP_PROPOSAL_APPROVAL ? format(values.PP_PROPOSAL_APPROVAL, "YYYY-MM-DD") : ""} />
             </div>
-            <div className="form-group col-md-3">
+            <div className="form-group col-md-4">
               <label htmlFor="manApprovalInput">PP Paper Approval </label>
-              <Field name="PP_MANUSCRIPT_APPROVAL" placeholder="PP Paper Approval" className="form-control" id="manApprovalInput" value={values.PP_MANUSCRIPT_APPROVAL || ""} />
+              <Field type="date" name="PP_MANUSCRIPT_APPROVAL" placeholder="PP Paper Approval" className="form-control" id="manApprovalInput" value={values.PP_MANUSCRIPT_APPROVAL || ""} />
             </div>
           </div>
 

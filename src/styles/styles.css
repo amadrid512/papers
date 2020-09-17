@@ -112,3 +112,11 @@ tfoot td {
 .invisible {
   visibility: false;
 }
+
+.p-chips {
+  display: block !important;
+}
+
+ul.p-inputtext {
+  border: 1px solid #ced4da !important;
+}

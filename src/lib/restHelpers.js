@@ -1,4 +1,3 @@
-//export const JSON_API_ROOT = process.env.REACT_APP_JSON_API_ROOT || "https://appccc.whi.org/api"
 export const JSON_API_ROOT = process.env.REACT_APP_JSON_API_ROOT || "https://devccc.whi.org/api"
 export const QUERYURL = `${JSON_API_ROOT}/query`
 export const CRUDURL = `${JSON_API_ROOT}/crud`
@@ -39,11 +38,13 @@ export async function fetchJson(url, params) {
 
 // all crud operations do the same thing, the only difference is the http method
 async function doCrudFetch(method, url, body) {
+  console.log(JSON.stringify(body))
   const resp = await fetch(url, {
     method,
     headers,
     body: JSON.stringify(body)
   })
+
   if (resp.status === 401 || resp.status === 403 || !resp.ok) throw resp
   return resp
 }
@@ -114,6 +115,8 @@ export function paramObjToParamStr(paramObj) {
 }
 
 function convertIfDate(value) {
+  //24-SEP-20 12.00.00.000000 AM
+  console.log("in convertIfDate")
   const iso8601RegExp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/
   const oracleDateExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
   // revive ISO 8601 date strings to instances of Date
@@ -126,10 +129,15 @@ function convertIfDate(value) {
   }
 }
 
-function convertStringDatesToJavascriptDates(data) {
+export function convertStringDatesToJavascriptDates(data) {
   const data2 = data.map(row => {
     let newRow = {}
-    Object.entries(row).forEach(entry => (newRow[entry[0]] = convertIfDate(entry[1])))
+    Object.entries(row).forEach(entry => {
+      const name = entry[0]
+      const value = entry[1]
+      if (Array.isArray(value)) newRow[name] = convertStringDatesToJavascriptDates(value)
+      else newRow[name] = convertIfDate(value)
+    })
     return newRow
   })
   return data2
