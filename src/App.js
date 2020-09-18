@@ -10,8 +10,8 @@ export function App() {
   return (
     <Router>
       <Home path="/" />
-      <DetailPage path="/detailpage/:id"/>
-      <ListPage path="/listpage"/>
+      <ListPage path="/listpage" />
+      <DetailPage path="/detailpage/:id" />
 
     </Router>
   )

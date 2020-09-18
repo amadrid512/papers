@@ -13,6 +13,9 @@ import Select from "react-select"
 import { MultiSelect } from "primereact/multiselect"
 import { Chips } from "primereact/chips"
 import { format } from 'date-fns'
+import { AuthorDetail } from "./AuthorDetail"
+import { ReviewerDetail } from "./ReviewerDetail"
+import { RefDetail } from "./RefDetail"
 
 export function DetailPage() {
   const { id } = useParams()
@@ -32,12 +35,6 @@ export function DetailPage() {
   const [sponsoringPI, setSponsoringPI] = React.useState()
   const [studies, setStudies] = React.useState()
   const [relatedStudies, setRelatedStudies] = React.useState()
-
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" }
-  ]
 
   const paperStudyURL = `${CRUDURL}/paper_studies`
 
@@ -185,18 +182,18 @@ export function DetailPage() {
           <div className="container">
             {data && <EditPaper editItem={data} stages={stages} analyticStages={analyticStages} statisticians={statisticians}
               paperTypes={paperTypes} dataFocus={dataFocus} paperFocus={paperFocus} sigs={sigs} alphaAuthors={alphaAuthors} consortia={consortia}
-              sponsoringPI={sponsoringPI} studies={studies} options={options}
+              sponsoringPI={sponsoringPI} studies={studies}
               doSubmit={doSubmit} deleteStudyPaper={deleteStudyPaper} addStudyToPaper={addStudyToPaper} cancelEdit={() => setData(null)} />}
           </div>
         </TabPanel>
         <TabPanel header="Author List">
-          <div className="container">{data && <EditAuthors editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
+          <div className="container">{data && <AuthorDetail editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
         </TabPanel>
         <TabPanel header="Reviewer Tracking">
-          <div className="container">{data && <EditReviewers editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
+          <div className="container">{data && <ReviewerDetail editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
         </TabPanel>
         <TabPanel header="Reference Detail">
-          <div className="container">{data && <EditRef editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
+          <div className="container">{data && <RefDetail editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
         </TabPanel>
       </TabView>
     </>
@@ -342,7 +339,8 @@ function EditPaper(props) {
             </div>
             <div className="form-group col-md-4">
               <label htmlFor="manApprovalInput">PP Paper Approval </label>
-              <Field type="date" name="PP_MANUSCRIPT_APPROVAL" placeholder="PP Paper Approval" className="form-control" id="manApprovalInput" value={values.PP_MANUSCRIPT_APPROVAL || ""} />
+              <Field type="date" name="PP_MANUSCRIPT_APPROVAL" placeholder="PP Paper Approval" className="form-control" id="manApprovalInput"
+                value={values.PP_MANUSCRIPT_APPROVAL ? format(values.PP_MANUSCRIPT_APPROVAL, "YYYY-MM-DD") : ""} />
             </div>
           </div>
 
@@ -380,135 +378,6 @@ function EditPaper(props) {
             <div className="form-group col-md-12">
               <label htmlFor="keywordsInput">Keywords</label>
               <Field name="KEYWORDS" placeholder="Keywords" className="form-control" id="keywordsInput" value={values.KEYWORDS || ""} />
-            </div>
-          </div>
-          <br />
-          <Button type="submit" label="Submit" />
-          {/* <Button type="button" className="p-button-secondary" label="Cancel" onClick={() => props.cancelEdit()} /> */}
-        </Form>
-      )}
-    </Formik>
-  )
-}
-
-function EditAuthors(props) {
-  return (
-    <Formik initialValues={{ ...props.editItem }} onSubmit={props.doSubmit}>
-      {() => (
-        <Form>
-          <div className="form-row">
-            <div className="form-group col-md-8">
-              <label htmlFor="authorsInput">List of Authors</label>
-              <Field name="AUTHORS" placeholder="List of Authors [Array]" className="form-control" id="authorsInput" />
-            </div>
-            <div className="form-group col-md-2">
-              <br></br>
-              <div className="form-check">
-                <Field name="NEWAUTHOR" className="form-control-sm form-check-input" id="authorsInput" type="checkbox" />
-                <label className="form-check-label" htmlFor="newAuthorInput">
-                  Lead Author <br></br>New to WHI
-                </label>
-              </div>
-            </div>
-            <div className="form-group col-md-2">
-              <br></br>
-              <div className="form-check">
-                <Field name="EARLYCAREERAUTHOR" className="form-control-sm form-check-input" id="earlyCareerInput" type="checkbox" />
-                <label className="form-check-label" htmlFor="earlyCareerInput">
-                  Early-career <br></br>investigator
-                </label>
-              </div>
-            </div>
-          </div>
-          <br />
-          <Button type="submit" label="Submit" />
-        </Form>
-      )}
-    </Formik>
-  )
-}
-
-function EditReviewers(props) {
-  return (
-    <Formik initialValues={{ ...props.editItem }} onSubmit={props.doSubmit}>
-      {() => (
-        <Form>
-          <div className="form-row">
-            <div className="form-group col-md-4">
-              <label htmlFor="propReviewer1Input">Proposal Reviewer 1</label>
-              <Field name="PROPREVIEWER1" placeholder="Proposal Reviewer 1" className="form-control" id="propReviewer1Input" />
-            </div>
-            <div className="form-group col-md-4">
-              <label htmlFor="propReviewer2Input">Proposal Reviewer 2</label>
-              <Field name="PROPREVIEWER2" placeholder="Proposal Reviewer 2" className="form-control" id="propReviewer2Input" />
-            </div>
-            <div className="form-group col-md-4">
-              <label htmlFor="propAgendaDatesInput">Agenda Dates Proposal</label>
-              <Field name="AGENDADATESPROP" placeholder="Agenda Dates Proposal" className="form-control" id="propAgendaDatesInput" />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group col-md-4">
-              <label htmlFor="manReviewer1Input">Manuscript Reviewer 1</label>
-              <Field name="MANREVIEWER1" placeholder="Manuscript Reviewer 1" className="form-control" id="manReviewer1Input" />
-            </div>
-            <div className="form-group col-md-4">
-              <label htmlFor="manReviewer2Input">Manuscript Reviewer 2</label>
-              <Field name="MANREVIEWER2" placeholder="Manuscript Reviewer 2" className="form-control" id="manReviewer2Input" />
-            </div>
-            <div className="form-group col-md-4">
-              <label htmlFor="manAgendaDatesInput">Agenda Dates Manuscript</label>
-              <Field name="AGENDADATESMAN" placeholder="Agenda Dates Manuscript" className="form-control" id="manAgendaDatesInput" />
-            </div>
-          </div>
-          <br />
-          <Button type="submit" label="Submit" />
-        </Form>
-      )}
-    </Formik>
-  )
-}
-
-function EditRef(props) {
-  return (
-    <Formik initialValues={{ ...props.editItem }} onSubmit={props.doSubmit}>
-      {({ setFieldValue, values }) => (
-        <Form>
-          <div className="form-row">
-            <div className="form-group col-md-8">
-              <label htmlFor="referenceInput">Reference</label>
-              <Field name="REFERENCE" placeholder="Reference" className="form-control" id="referenceInput" value={values.REFERENCE || ""} />
-            </div>
-            <div className="form-group col-md-2">
-              <label htmlFor="pubMonthInput">Pub Month </label>
-              <Field name="PUB_MONTH" placeholder="Pub Month " className="form-control" id="pubMonthInput" value={values.PUB_MONTH || ""} />
-            </div>
-            <div className="form-group col-md-2">
-              <label htmlFor="pubYearInput">Pub Year </label>
-              <Field name="PUB_YEAR" placeholder="Pub Year " className="form-control" id="pubYearInput" value={values.PUB_YEAR || ""} />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group col-md-8">
-              <label htmlFor="citationInput">Full Citation</label>
-              <Field name="FULL_CITATION" placeholder="Full Citation" className="form-control" id="citationInput" value={values.FULL_CITATION || ""} />
-            </div>
-            <div className="form-group col-md-2">
-              <label htmlFor="pubmedIDInput">PubMed ID </label>
-              <Field name="PMID" placeholder="PubMed ID" className="form-control" id="pubmedIDInput" value={values.PMID || ""} />
-            </div>
-            <div className="form-group col-md-2">
-              <label htmlFor="pubmedCentralInput">PubMed Central </label>
-              <Field name="PUBMED_CENTRAL" placeholder="PubMed Central" className="form-control" id="pubmedCentralInput" value={values.PUBMED_CENTRAL || ""} />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group col-md-12">
-              <label htmlFor="abstractInput">Abstract</label>
-              <Field name="ABSTRACT" placeholder="Abstract" className="form-control" id="abstractInput" value={values.ABSTRACT || ""} />
             </div>
           </div>
           <br />
