@@ -3,7 +3,7 @@
 @import './components/WhiYearReport.css';
 @import './components/fteTable.css';
  */
- 
+
 button.textOnly {
   background: transparent;
   color: #777;
@@ -20,6 +20,10 @@ body {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+h5 {
+  padding: 5px;
 }
 
 hr {

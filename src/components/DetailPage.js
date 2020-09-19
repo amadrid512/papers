@@ -177,6 +177,7 @@ export function DetailPage() {
   return (
     <>
       <MainMenu />
+      <h5>Manuscript: {id} - {data && data.TITLE} </h5>
       <TabView>
         <TabPanel header="Paper Detail">
           <div className="container">
