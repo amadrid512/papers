@@ -188,7 +188,8 @@ export function DetailPage() {
           </div>
         </TabPanel>
         <TabPanel header="Author List">
-          <div className="container">{data && <AuthorDetail editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
+          <div className="container">
+            {data && <AuthorDetail data={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
         </TabPanel>
         <TabPanel header="Reviewer Tracking">
           <div className="container">{data && <ReviewerDetail editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
@@ -297,7 +298,7 @@ function EditPaper(props) {
 
           <div className="form-row">
             <div className="form-group col-md-12">
-              <label htmlFor="relatedPapersInput">Related Papers</label>
+              <label htmlFor="relatedStudiesInput">Related studies</label>
               <Chips value={props.editItem.RELATED_STUDIES ? props.editItem.RELATED_STUDIES.map(row => row.STUDY_ABBR) : []}
                 onAdd={e => props.addStudyToPaper(e.value)}
                 onRemove={e => props.deleteStudyPaper(e.value)}
