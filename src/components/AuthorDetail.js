@@ -6,30 +6,41 @@ import { FaPlus, FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { InputText } from 'primereact/inputtext'
+import { AutoComplete } from 'primereact/autocomplete';
 import { Link } from "@reach/router"
 
-import MainMenu from "./MainMenu"
-import { TabView, TabPanel } from "primereact/tabview"
-import { Col } from "react-bootstrap"
 
-
-
-export function AuthorDetail({ data, doSubmit, cancelEdit }) {
+export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
   const [authorList, setAuthorlist] = React.useState(data.AUTHORS)
   const [editItem, setEditItem] = React.useState({
     AUTH_ORDER: "",
     AUTH_ID: "",
     LASTNAME: "",
     FIRSTNAME: "",
-    EMAIL: ""
+    EMAIL: "",
+    FULLNAME: ""
   }) //holds the row to be edited or inserted
   const [refreshData, setRefreshData] = React.useState(true) // used to fire a re-query of the data after a crud op
 
   const crudUrl = `${CRUDURL}/papers`
+  const paperAuthorsURL = `${CRUDURL}/paper_authors`
+
+  function addAuthorToPaper() {
+    //await doInsert(paperAuthorsURL, { MS_ID: data.MS_ID, AUTH_ID: '', LASTNAME: '', AUTH_ORDER: '' }).then(() => setRefreshData(true))
+    console.log(authorList.length)
+    setAuthorlist(authorList.concat({
+      AUTH_ORDER: authorList.length + 1,
+      AUTH_ID: "",
+      LASTNAME: "",
+      FIRSTNAME: "",
+      EMAIL: "",
+      FULLNAME: ""
+    }))
+  }
 
   async function deleteItem(item) {
     //do delete after confirming its ok
-    if (window.confirm("are you sure you want to delete MS" + item.MS_ID + "?")) {
+    if (window.confirm("Are you sure you want to delete this author" + item.MS_ID + "?")) {
       await doDelete(crudUrl, item)
       setRefreshData(true)
     }
@@ -38,9 +49,6 @@ export function AuthorDetail({ data, doSubmit, cancelEdit }) {
   function actions(rowdata) {
     return (
       <>
-        <button className="btn" onClick={() => setEditItem(rowdata)}>
-          <FaPencilAlt title="Edit" />
-        </button>
         <button className="btn ml-2" onClick={() => deleteItem(rowdata)}>
           <FaTrashAlt title="Delete" />
         </button>
@@ -54,22 +62,36 @@ export function AuthorDetail({ data, doSubmit, cancelEdit }) {
     updatedAuthors[props.rowIndex].updated = true
 
     setAuthorlist(updatedAuthors)
+  }
 
-    //setEditItem()
-    //this.setState({ [`${productKey}`]: updatedProducts });
+  function searchAuthors(event) {
+    console.log(alphaAuthors[0])
+    setTimeout(() => {
+      let filteredAuthors;
+      if (!event.query.trim().length) {
+        filteredAuthors = [...alphaAuthors];
+      }
+      else {
+        filteredAuthors = alphaAuthors.filter((AUTHOR) => {
+          return alphaAuthors.AUTHOR.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
 
-    //console.log(newValue, field)
-    //setEditItem({ ...editItem, field: newValue })
-    //{ MS_ID: id, STUDY_ABBR: studyUpper }
-    //await doEdit(`${CRUDURL}/paper_authors`, { [`${field}`]: newValue }).then(resp => setRefreshData(true))
+      setAuthorlist({ filteredAuthors });
+    }, 250);
   }
 
   function inputTextEditor(props, field) {
-    return <InputText type="text" value={props.rowData[field]} onChange={(e) => changeAuthor(field, props, e.target.value)} />;
+    console.log(props.rowData.FULLNAME)
+    return (
+      //<InputText type="text" value={props.rowData.FULLNAME} onChange={(e) => changeAuthor(field, props, e.target.value)} />
+      <AutoComplete value={props.rowData.FULLNAME} suggestions={alphaAuthors.AUTHOR} completeMethod={searchAuthors} field="name" multiple onChange={(e) => changeAuthor(field, props, e.target.value)} />
+    )
+
   }
 
   function nameEditor(props) {
-    return inputTextEditor(props, 'LASTNAME');
+    return inputTextEditor(props, 'FULLNAME');
   }
 
   function emailEditor(props) {
@@ -110,21 +132,25 @@ export function AuthorDetail({ data, doSubmit, cancelEdit }) {
         )}
       </Formik>
 
+      <button className="btn ml-2" onClick={addAuthorToPaper} >
+        Add Author <FaPlus title="Add" label="Add Author" />
+      </button>
 
       <DataTable value={authorList} editMode="cell" className="editable-cells-table">
-        <Column field="AUTH_ID" header="ID" style={{ width: '10%' }} > </Column>
-        <Column field="LASTNAME" header="Author" style={{ width: '70%' }} editor={(e) => nameEditor(e)}></Column>
-        <Column field="EMAIL" header="Email" style={{ width: '40%' }} editor={(e) => emailEditor(e)}></Column>
+
+        <Column field="FULLNAME" header="Author" style={{ width: '80%' }} editor={(e) => nameEditor(e)}>
+          {/* <AutoComplete value={authorList.FULLNAME} suggestions={alphaAuthors.AUTHOR} completeMethod={""} field="name" multiple onChange={""} /> */}
+        </Column>
         <Column field="AUTH_ORDER" header="Order" style={{ width: '10%' }} editor={(e) => orderEditor(e)}></Column>
-        <Column header="Actions" sortable={false} body={actions} style={{ width: '20%' }} />
+        <Column sortable={false} body={actions} style={{ width: '10%' }} />
 
       </DataTable>
 
-      <Button type="submit" label="Submit" />
-
+      <Button type="submit" label="Submit" className="p-button-raised" />
 
     </div>
   )
+
 }
 
 

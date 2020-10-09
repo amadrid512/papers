@@ -189,7 +189,7 @@ export function DetailPage() {
         </TabPanel>
         <TabPanel header="Author List">
           <div className="container">
-            {data && <AuthorDetail data={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
+            {data && <AuthorDetail data={data} alphaAuthors={alphaAuthors} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
         </TabPanel>
         <TabPanel header="Reviewer Tracking">
           <div className="container">{data && <ReviewerDetail editItem={data} doSubmit={doSubmit} cancelEdit={() => setData(null)} />}</div>
@@ -229,7 +229,7 @@ function EditPaper(props) {
               <Field as="select" name="SPONSORING_PI" placeholder="Sponsoring PI" className="form-control" id="sponsorPIInput" value={values.SPONSORING_PI || ""}>
                 {props.sponsoringPI &&
                   props.sponsoringPI.map(row => {
-                    return <option key={row.SPONSOR_ID} value={row.SPONSOR_ID === null ? "" : row.SPONSOR_ID} label={row.SPONSOR} />
+                    return <option key={row.AUTH_ID} value={row.AUTH_ID === null ? "" : row.AUTH_ID} label={row.FULLNAME} />
                   })}
               </Field>
             </div>
