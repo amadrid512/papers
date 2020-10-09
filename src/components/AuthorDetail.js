@@ -12,6 +12,7 @@ import { Link } from "@reach/router"
 
 export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
   const [authorList, setAuthorlist] = React.useState(data.AUTHORS)
+  const [filteredAuthors, setFilteredAuthors] = React.useState()
   const [editItem, setEditItem] = React.useState({
     AUTH_ORDER: "",
     AUTH_ID: "",
@@ -26,76 +27,71 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
   const paperAuthorsURL = `${CRUDURL}/paper_authors`
 
   function addAuthorToPaper() {
-    //await doInsert(paperAuthorsURL, { MS_ID: data.MS_ID, AUTH_ID: '', LASTNAME: '', AUTH_ORDER: '' }).then(() => setRefreshData(true))
     console.log(authorList.length)
     setAuthorlist(authorList.concat({
       AUTH_ORDER: authorList.length + 1,
       AUTH_ID: "",
-      LASTNAME: "",
-      FIRSTNAME: "",
-      EMAIL: "",
-      FULLNAME: ""
+      FULLNAME: "",
+      EDIT_STATUS: "A"
     }))
   }
 
-  async function deleteItem(item) {
+  async function deleteItem(item, props) {
     //do delete after confirming its ok
-    if (window.confirm("Are you sure you want to delete this author" + item.MS_ID + "?")) {
-      await doDelete(crudUrl, item)
-      setRefreshData(true)
-    }
+    let updatedAuthors = [...props.value]
+    updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'D'
+    setAuthorlist(updatedAuthors)
   }
 
-  function actions(rowdata) {
+  function actions(rowdata, props) {
     return (
       <>
-        <button className="btn ml-2" onClick={() => deleteItem(rowdata)}>
+        <button className="btn ml-2" onClick={() => deleteItem(rowdata, props)}>
           <FaTrashAlt title="Delete" />
         </button>
       </>
     )
   }
 
-  async function changeAuthor(field, props, value) {
+  async function changeAuthor(props, value) {
     let updatedAuthors = [...props.value]
-    updatedAuthors[props.rowIndex][props.field] = value
-    updatedAuthors[props.rowIndex].updated = true
+
+    if (value.AUTH_ID) {
+      updatedAuthors[props.rowIndex]['AUTH_ID'] = value.AUTH_ID
+      updatedAuthors[props.rowIndex]['FULLNAME'] = value.AUTHOR
+      updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'E'
+    } else {
+      updatedAuthors[props.rowIndex]['AUTH_ID'] = null
+      updatedAuthors[props.rowIndex]['FULLNAME'] = value
+      updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'E'
+    }
 
     setAuthorlist(updatedAuthors)
   }
 
   function searchAuthors(event) {
-    console.log(alphaAuthors[0])
     setTimeout(() => {
-      let filteredAuthors;
-      if (!event.query.trim().length) {
-        filteredAuthors = [...alphaAuthors];
-      }
-      else {
-        filteredAuthors = alphaAuthors.filter((AUTHOR) => {
-          return alphaAuthors.AUTHOR.toLowerCase().startsWith(event.query.toLowerCase());
-        });
-      }
+      let results = alphaAuthors.filter(author => {
+        return author.AUTHOR.toLowerCase().includes(event.query.toLowerCase());
+      });
 
-      setAuthorlist({ filteredAuthors });
+      setFilteredAuthors(results)
     }, 250);
   }
+
 
   function inputTextEditor(props, field) {
     console.log(props.rowData.FULLNAME)
     return (
       //<InputText type="text" value={props.rowData.FULLNAME} onChange={(e) => changeAuthor(field, props, e.target.value)} />
-      <AutoComplete value={props.rowData.FULLNAME} suggestions={alphaAuthors.AUTHOR} completeMethod={searchAuthors} field="name" multiple onChange={(e) => changeAuthor(field, props, e.target.value)} />
+      <AutoComplete value={props.rowData.FULLNAME}
+        suggestions={alphaAuthors.AUTHOR}
+        completeMethod={searchAuthors}
+        field="AUTHOR"
+        multiple={true}
+        onChange={(e) => changeAuthor(field, props, e.target.value)} />
     )
 
-  }
-
-  function nameEditor(props) {
-    return inputTextEditor(props, 'FULLNAME');
-  }
-
-  function emailEditor(props) {
-    return inputTextEditor(props, 'EMAIL');
   }
 
   function orderEditor(props) {
@@ -136,10 +132,17 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
         Add Author <FaPlus title="Add" label="Add Author" />
       </button>
 
-      <DataTable value={authorList} editMode="cell" className="editable-cells-table">
+      <DataTable value={authorList.filter(author => author.EDIT_STATUS !== 'D')} editMode="cell" className="editable-cells-table">
 
-        <Column field="FULLNAME" header="Author" style={{ width: '80%' }} editor={(e) => nameEditor(e)}>
-          {/* <AutoComplete value={authorList.FULLNAME} suggestions={alphaAuthors.AUTHOR} completeMethod={""} field="name" multiple onChange={""} /> */}
+        <Column field="FULLNAME" header="Author" style={{ width: '80%' }}
+          body={(rowData, props) => {
+            return (
+              <AutoComplete value={rowData.FULLNAME}
+                suggestions={filteredAuthors}
+                completeMethod={searchAuthors}
+                field="AUTHOR"
+                onChange={(e) => changeAuthor(props, e.target.value)} />)
+          }}>
         </Column>
         <Column field="AUTH_ORDER" header="Order" style={{ width: '10%' }} editor={(e) => orderEditor(e)}></Column>
         <Column sortable={false} body={actions} style={{ width: '10%' }} />
