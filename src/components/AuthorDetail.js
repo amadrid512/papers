@@ -53,18 +53,19 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
     )
   }
 
-  async function changeAuthor(props, value) {
+  async function changeAuthor(props, newValue) {
+    console.log(props)
     let updatedAuthors = [...props.value]
 
-    if (value.AUTH_ID) {
-      updatedAuthors[props.rowIndex]['AUTH_ID'] = value.AUTH_ID
-      updatedAuthors[props.rowIndex]['FULLNAME'] = value.AUTHOR
-      updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'E'
+    if (newValue.AUTH_ID) {
+      updatedAuthors[props.rowIndex]['AUTH_ID'] = newValue.AUTH_ID
+      updatedAuthors[props.rowIndex]['FULLNAME'] = newValue.AUTHOR
     } else {
       updatedAuthors[props.rowIndex]['AUTH_ID'] = null
-      updatedAuthors[props.rowIndex]['FULLNAME'] = value
-      updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'E'
+      updatedAuthors[props.rowIndex]['FULLNAME'] = newValue
     }
+
+    if (updatedAuthors[props.rowIndex]['EDIT_STATUS'] !== 'A') updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'E'
 
     setAuthorlist(updatedAuthors)
   }
@@ -79,24 +80,14 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
     }, 250);
   }
 
-
-  function inputTextEditor(props, field) {
-    console.log(props.rowData.FULLNAME)
-    return (
-      //<InputText type="text" value={props.rowData.FULLNAME} onChange={(e) => changeAuthor(field, props, e.target.value)} />
-      <AutoComplete value={props.rowData.FULLNAME}
-        suggestions={alphaAuthors.AUTHOR}
-        completeMethod={searchAuthors}
-        field="AUTHOR"
-        multiple={true}
-        onChange={(e) => changeAuthor(field, props, e.target.value)} />
-    )
-
+  function changeOrder(props, newValue) {
+    //console.log(newValue)
+    let updatedAuthors = [...props.value]
+    updatedAuthors[props.rowIndex]['AUTH_ORDER'] = newValue
+    if (updatedAuthors[props.rowIndex]['EDIT_STATUS'] !== 'A') updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'E'
+    setAuthorlist(updatedAuthors)
   }
 
-  function orderEditor(props) {
-    return inputTextEditor(props, 'AUTH_ORDER');
-  }
 
   return (
     <div className="container">
@@ -133,18 +124,26 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
       </button>
 
       <DataTable value={authorList.filter(author => author.EDIT_STATUS !== 'D')} editMode="cell" className="editable-cells-table">
-
-        <Column field="FULLNAME" header="Author" style={{ width: '80%' }}
+        {/* <Column rowReorder style={{ width: '5%' }} /> */}
+        <Column field="FULLNAME" header="Author" style={{ width: '75%' }}
           body={(rowData, props) => {
             return (
               <AutoComplete value={rowData.FULLNAME}
                 suggestions={filteredAuthors}
                 completeMethod={searchAuthors}
+                style={{ width: '100%' }}
                 field="AUTHOR"
                 onChange={(e) => changeAuthor(props, e.target.value)} />)
           }}>
         </Column>
-        <Column field="AUTH_ORDER" header="Order" style={{ width: '10%' }} editor={(e) => orderEditor(e)}></Column>
+        <Column field="AUTH_ORDER" header="Order" style={{ width: '10%' }}
+          body={(rowData, props) => {
+            return (
+              <InputText type="text" name='AUTH_ORDER' style={{ width: '100%' }} value={rowData.AUTH_ORDER} onChange={e => changeOrder(props, e.target.value)} />
+            )
+          }}>
+
+        </Column>
         <Column sortable={false} body={actions} style={{ width: '10%' }} />
 
       </DataTable>
