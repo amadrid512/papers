@@ -161,8 +161,7 @@ export function DetailPage() {
     }
 
     if (data.RELATED_STUDIES.filter(s => s.STUDY_ABBR === studyUpper).length > 0) {
-      alert("Study already exists in paper")
-      return
+      return alert("Study already exists in paper")
     }
     await doInsert(paperStudyURL, { MS_ID: id, STUDY_ABBR: studyUpper }).then(() => setRefreshData(true))
   }

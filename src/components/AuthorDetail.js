@@ -27,7 +27,7 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
   const paperAuthorsURL = `${CRUDURL}/paper_authors`
 
   function addAuthorToPaper() {
-    console.log(authorList.length)
+    //console.log(authorList.length)
     setAuthorlist(authorList.concat({
       AUTH_ORDER: authorList.length + 1,
       AUTH_ID: "",
@@ -38,9 +38,11 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
 
   async function deleteItem(item, props) {
     //do delete after confirming its ok
-    let updatedAuthors = [...props.value]
-    updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'D'
-    setAuthorlist(updatedAuthors)
+    if (window.confirm("Are you sure you want to delete " + item.FULLNAME + "?")) {
+      let updatedAuthors = [...props.value]
+      updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'D'
+      setAuthorlist(updatedAuthors)
+    }
   }
 
   function actions(rowdata, props) {
@@ -54,9 +56,12 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
   }
 
   async function changeAuthor(props, newValue) {
-    console.log(props)
-    let updatedAuthors = [...props.value]
+    console.log(newValue)
+    console.log(authorList)
+    //check if newValue is already in authorList
 
+    let updatedAuthors = [...props.value]
+    console.log(updatedAuthors)
     if (newValue.AUTH_ID) {
       updatedAuthors[props.rowIndex]['AUTH_ID'] = newValue.AUTH_ID
       updatedAuthors[props.rowIndex]['FULLNAME'] = newValue.AUTHOR
@@ -88,6 +93,66 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
     setAuthorlist(updatedAuthors)
   }
 
+  function hasDuplicates(arr) {
+    return new Set(arr).size !== arr.length;
+  }
+
+  async function doSubmit() {
+    // *********** NEED TO TEST THIS FUNCTION**************************
+
+
+    //paper_authors table: MS_ID, AUTH_ID, AUTH_ORDER
+    //alert("great shot!")
+    console.log((authorList))
+    let auth_ids = authorList.map(a => a.AUTH_ID)
+    //check for author duplicates
+    if (hasDuplicates(auth_ids)) {
+      return alert("ERROR: There are duplicate authors listed.")
+    }
+    let auth_orders = authorList.map(a => a.AUTH_ORDER)
+    //check for order duplicates
+    if (hasDuplicates(auth_orders)) {
+      return alert("ERROR: There are duplicates in the author order.")
+    }
+
+    const authsToDelete = authorList.filter(a => a.EDIT_STATUS === "D")
+    console.log(authsToDelete)
+    const deletePromises = authsToDelete.map(row => doDelete(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
+    await Promise.all(deletePromises)
+
+    const authsToAdd = authorList.filter(a => a.EDIT_STATUS === "A")
+    console.log(authsToAdd)
+    const addPromises = authsToAdd.map(row => doInsert(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
+    await Promise.all(addPromises)
+
+
+    const authsToEdit = authorList.filter(a => a.EDIT_STATUS === "E")
+    console.log(authsToEdit)
+    const editPromises = authsToEdit.map(row => doEdit(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
+    await Promise.all(editPromises)
+
+
+    /*     authorList.forEach(async function (auth) {
+          switch (auth.EDIT_STATUS) {
+            case "D":      //delete author = D: 
+              console.log("delete")
+              await doDelete(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: auth.AUTH_ID, AUTH_ORDER: auth.AUTH_ORDER })
+              break;
+            case "A":      //add author = A
+              console.log("add")
+              await doInsert(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: auth.AUTH_ID, AUTH_ORDER: auth.AUTH_ORDER })
+              break;
+            case "E":      //edit author = E
+              console.log("edit")
+              await doEdit(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: auth.AUTH_ID, AUTH_ORDER: auth.AUTH_ORDER })
+              break;
+            default:
+              console.log("no change");
+          }
+        })
+     */
+    setAuthorlist(authorList)
+  }
 
   return (
     <div className="container">
@@ -147,8 +212,8 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
         <Column sortable={false} body={actions} style={{ width: '10%' }} />
 
       </DataTable>
+      <Button type="submit" label="Submit" className="p-button-raised" onClick={doSubmit} />
 
-      <Button type="submit" label="Submit" className="p-button-raised" />
 
     </div>
   )
