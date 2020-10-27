@@ -38,9 +38,16 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
 
   async function deleteItem(item, props) {
     //do delete after confirming its ok
-    if (window.confirm("Are you sure you want to delete " + item.FULLNAME + "?")) {
-      let updatedAuthors = [...props.value]
-      updatedAuthors[props.rowIndex]['EDIT_STATUS'] = 'D'
+    let authors = [...props.value]  
+    authors[props.rowIndex]['EDIT_STATUS'] = 'D'
+      if (window.confirm("Are you sure you want to delete " + item.FULLNAME + "?")) {
+      try{
+        doDelete(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: item.AUTH_ID, AUTH_ORDER: item.AUTH_ORDER })
+      }catch (error) {
+        alert("Something went wrong with delete")
+      }
+      let updatedAuthors = authors.filter(a => a.EDIT_STATUS !== "D")
+
       setAuthorlist(updatedAuthors)
     }
   }
@@ -100,58 +107,36 @@ export function AuthorDetail({ data, alphaAuthors, doSubmit, cancelEdit }) {
   async function doSubmit() {
     // *********** NEED TO TEST THIS FUNCTION**************************
 
+    try {    //paper_authors table: MS_ID, AUTH_ID, AUTH_ORDER
+      console.log((authorList))
 
-    //paper_authors table: MS_ID, AUTH_ID, AUTH_ORDER
-    //alert("great shot!")
-    console.log((authorList))
-    let auth_ids = authorList.map(a => a.AUTH_ID)
-    //check for author duplicates
-    if (hasDuplicates(auth_ids)) {
-      return alert("ERROR: There are duplicate authors listed.")
+      let auth_ids = authorList.map(a => a.AUTH_ID)
+      //check for author duplicates
+      if (hasDuplicates(auth_ids)) {
+        return alert("ERROR: There are duplicate authors listed.")
+      }
+      let auth_orders = authorList.map(a => a.AUTH_ORDER)
+      //check for order duplicates
+      if (hasDuplicates(auth_orders)) {
+        return alert("ERROR: There are duplicates in the author order.")
+      }
+
+      const authsToAdd = authorList.filter(a => a.EDIT_STATUS === "A")
+      console.log(authsToAdd)
+      const addPromises = authsToAdd.map(row => doInsert(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
+      await Promise.all(addPromises)
+
+      const authsToEdit = authorList.filter(a => a.EDIT_STATUS === "E")
+      console.log(authsToEdit)
+      const editPromises = authsToEdit.map(row => doEdit(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
+      await Promise.all(editPromises)
+    } catch (error) {
+      alert("Something went wrong")
     }
-    let auth_orders = authorList.map(a => a.AUTH_ORDER)
-    //check for order duplicates
-    if (hasDuplicates(auth_orders)) {
-      return alert("ERROR: There are duplicates in the author order.")
-    }
 
-    const authsToDelete = authorList.filter(a => a.EDIT_STATUS === "D")
-    console.log(authsToDelete)
-    const deletePromises = authsToDelete.map(row => doDelete(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
-    await Promise.all(deletePromises)
+      setAuthorlist(authorList)
+      alert("The author list has been SAVED")
 
-    const authsToAdd = authorList.filter(a => a.EDIT_STATUS === "A")
-    console.log(authsToAdd)
-    const addPromises = authsToAdd.map(row => doInsert(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
-    await Promise.all(addPromises)
-
-
-    const authsToEdit = authorList.filter(a => a.EDIT_STATUS === "E")
-    console.log(authsToEdit)
-    const editPromises = authsToEdit.map(row => doEdit(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: row.AUTH_ID, AUTH_ORDER: row.AUTH_ORDER }))
-    await Promise.all(editPromises)
-
-
-    /*     authorList.forEach(async function (auth) {
-          switch (auth.EDIT_STATUS) {
-            case "D":      //delete author = D: 
-              console.log("delete")
-              await doDelete(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: auth.AUTH_ID, AUTH_ORDER: auth.AUTH_ORDER })
-              break;
-            case "A":      //add author = A
-              console.log("add")
-              await doInsert(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: auth.AUTH_ID, AUTH_ORDER: auth.AUTH_ORDER })
-              break;
-            case "E":      //edit author = E
-              console.log("edit")
-              await doEdit(`${CRUDURL}/paper_authors`, { MS_ID: data.MS_ID, AUTH_ID: auth.AUTH_ID, AUTH_ORDER: auth.AUTH_ORDER })
-              break;
-            default:
-              console.log("no change");
-          }
-        })
-     */
-    setAuthorlist(authorList)
   }
 
   return (

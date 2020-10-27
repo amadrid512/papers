@@ -308,7 +308,7 @@ function EditPaper(props) {
           <div className="form-row">
             <div className="form-group col-md-4">
               <div className="form-check">
-                <Field name="NDI_DATA_USED" className="form-control-sm form-check-input" id="ndiDataInput" type="checkbox" value={values.NDI_DATA_USED || ""} />
+                <Field name="NDI_DATA_USED" className="form-control-sm form-check-input" id="ndiDataInput" type="checkbox" value="Y" />
                 <label className="form-check-label" htmlFor="ndiDataInput">
                   National Death Index<br></br> Data Used{" "}
                 </label>
